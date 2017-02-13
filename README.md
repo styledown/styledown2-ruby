@@ -12,7 +12,25 @@ gem 'styledown2'
 
 ## API
 
-This implements the same API as the JavaScript `styledown2`.
+### Object-oriented API
+
+This gem provides a `Styledown` class.
+
+```rb
+styleguide = Styledown.new('/path/to/styleguides')
+styleguide.render  # Updates #output
+
+styleguide.output
+# => {
+#   'buttons.html' => { 'contents' => '...' },
+#   'forms.html' => { 'contents' => '...' },
+#   'styledown/script.js' => { 'contents' => '...' }
+# }
+```
+
+### Functional API
+
+This implements the same functional API as the JavaScript `styledown2`.
 
 ```rb
 files  = Styledown.read(...)
