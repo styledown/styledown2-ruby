@@ -63,9 +63,9 @@ class Styledown
     @paths = paths
   end
 
-  def options=(paths)
+  def options=(options)
     invalidate
-    @options = paths
+    @options = options
   end
 
   # Renders if needed. Does nothing if it's already been rendered.
