@@ -52,6 +52,8 @@ class Styledown
     @input = nil
     @data = nil
     @output = nil
+
+    @data_filters = []
   end
 
   # Re-reads files, processes them, and updates the `#output`.
@@ -59,9 +61,55 @@ class Styledown
   # Also aliased as `#reload`.
   def render
     @input  = Styledown.read(@paths, @options)
-    @data   = Styledown.build(@input, @options)
+    @data = Styledown.build(@input, @options)
+    @data = apply_data_filters(@data)
     @output = Styledown.render(@data, @options)
     self
+  end
+
+  def add_data_filter(&blk)
+    @data_filters << blk
+  end
+
+  # Adds a function that will transform files on `#render`.
+  # The given block should return `[fname, file]`.
+  def add_file_filter(&blk)
+    add_data_filter do |data|
+      files = data['files'].map do |fname, file|
+        blk.(fname, file) # => [fname, file]
+      end
+      data['files'] = Hash[files]
+      data
+    end
+  end
+
+  # Adds a function that will transform sections on `#render`.
+  def add_section_filter(&blk)
+    add_file_filter do |fname, file|
+      file['sections'].map! do |section|
+        blk.(section, fname, file)
+      end if file['sections']
+      [fname, file]
+    end
+  end
+
+  # Adds a function that will transform section parts on `#render`.
+  def add_part_filter(&blk)
+    add_section_filter do |section, fname, file|
+      section['parts'].map! do |part|
+        blk.(part, section, fname, file)
+      end if section['parts']
+      section
+    end
+  end
+
+  private
+
+  # Applies data filters defined by `add_*_filter` functions.
+  def apply_data_filters(data)
+    @data_filters.reduce(data) do |data, filter|
+      filter.(data)
+    end
   end
 
   alias :reload :render
