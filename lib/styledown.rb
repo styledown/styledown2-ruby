@@ -1,4 +1,5 @@
 require 'styledown/source'
+require 'styledown/file_reader'
 
 class Styledown
   def self.context
@@ -18,24 +19,8 @@ class Styledown
 
   # Reimplementation of Styledown.read(). Reads files and returns their contents into a Hash.
   def self.read(paths, options = {})
-    paths = [*paths]
-
-    paths.inject({}) do |result, path|
-      path = File.absolute_path(path)
-      glob = File.join(path, SEARCH_GLOB)
-      files = Dir[glob]
-
-      files.each do |file|
-        short_file = file[(path.length + File::SEPARATOR.length)..-1]
-          .gsub(/#{File::SEPARATOR}/, '/')
-        result[short_file] = { 'contents' => File.read(file) }
-      end
-
-      result
-    end
+    FileReader.read(paths, options)
   end
-
-  SEARCH_GLOB = '{styledown.json,**/*.md,templates/**/*.{html,js,css}}'
 
   # You can change these and they will be honored on next #render
   attr_reader :paths
@@ -65,18 +50,15 @@ class Styledown
     @options = options
   end
 
-  # Renders if needed. Does nothing if it's already been rendered.
+  # Reads files, processes them, and updates the `#output`.
   def render
-    # TODO: mtime caching
-    render! unless @output
-    self
+    # Bust the cache if it's been modified since last render
+    if_updated { invalidate }
+    render_if_needed
   end
 
-  # Re-reads files, processes them, and updates the `#output`.
-  #
-  # Also aliased as `#reload`.
-  def render!
-    invalidate
+  # Renders without invalidation.
+  def render_if_needed
     @input ||= Styledown.read(@paths, @options)
     @raw_data ||= Styledown.build(@input, @options)
     @data ||= apply_data_filters(@raw_data)
@@ -84,8 +66,16 @@ class Styledown
     self
   end
 
+  # Like `#render`, but always re-runs.
+  # Also aliased as `#reload`.
+  def render!
+    invalidate
+    render
+  end
+
   # Busts the cache
   def invalidate
+    @mtime = nil
     @input = nil
     @raw_data = nil
     invalidate_data
@@ -155,12 +145,19 @@ class Styledown
 
   private
 
+  # Checks if it's been update since last call of `#if_updated`.
+  def if_updated(&blk)
+    mtime = Styledown::FileReader.mtime(@paths)
+    if mtime != @mtime
+      yield
+      @mtime = mtime
+    end
+  end
+
   # Applies data filters defined by `add_*_filter` functions.
   def apply_data_filters(data)
     @data_filters.reduce(data) do |data_, filter|
       filter.(data_)
     end
   end
-
-  alias :reload :render!
 end

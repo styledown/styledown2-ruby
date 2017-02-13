@@ -21,7 +21,13 @@ styleguide.output
 
 > `styleguide.render`
 
-Processes files and updates [#output](#output). This is also aliased as `#reload`. See [Styledown class](#styledown) for an example.
+Processes files and updates [#output](#output). Styledown keeps a cache, so this will not re-read or re-process if no files have changed. See [Styledown class](#styledown) for an example.
+
+### render!
+
+> `styleguide.render!`
+
+Forces a [#render](#render) regardless of whether files have changed or not.
 
 ### output
 
@@ -102,6 +108,14 @@ end
 
 styleguide.render
 ```
+
+### invalidate
+
+Invalidates the cache so that the next [#render](#render) will always run.
+
+### invalidate_data
+
+Partially invalidates the cache so that the next [#render](#render) will always run the build step. It will not re-run the read step, however.
 
 ## Class functions
 
