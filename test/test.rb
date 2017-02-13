@@ -11,6 +11,14 @@ describe 'Functional API' do
     expect(result['buttons.html']['contents']).must_include "<h1 id='hello'>Hello</h1>"
     expect(result['buttons.html']['contents']).must_include "name='generator' content='Styledown2 2"
   end
+
+  it 'honors extensions' do
+    data = Styledown.build({ 'buttons.md': { contents: '# Hello' } }, extension: '')
+    result = Styledown.render(data)
+
+    expect(result['buttons']['contents']).must_include "<h1 id='hello'>Hello</h1>"
+    expect(result['buttons']['contents']).must_include "name='generator' content='Styledown2 2"
+  end
 end
 
 describe '#read' do
@@ -41,7 +49,7 @@ describe 'OOP API' do
       data['files'].each do |fname, file|
         file['sections'].each do |section|
           section['parts'].each do |part|
-            part['preClass'] = 'lang-wololo'
+            part['class'] = 'wololo'
           end if section['parts']
         end if file['sections']
       end
@@ -52,13 +60,13 @@ describe 'OOP API' do
     result = styleguide.output
 
     html = result['buttons.html']['contents']
-    expect(html).must_include 'lang-wololo'
+    expect(html).must_include 'wololo'
   end
 
   it 'should honor part filters' do
     styleguide = Styledown.new(EXAMPLE, skipAssets: true)
     styleguide.add_part_filter do |part|
-      part['preClass'] = 'lang-wololo'
+      part['class'] = 'wololo'
       part
     end
     styleguide.render
@@ -66,7 +74,7 @@ describe 'OOP API' do
     result = styleguide.output
 
     html = result['buttons.html']['contents']
-    expect(html).must_include 'lang-wololo'
+    expect(html).must_include 'wololo'
   end
 
   it 'should honor figure filters' do
