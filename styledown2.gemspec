@@ -19,4 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'styledown2-source', "= #{Styledown::VERSION}"
+  spec.add_dependency 'execjs', '< 3.0.0'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'minitest'
 end

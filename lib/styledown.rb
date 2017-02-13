@@ -1,6 +1,6 @@
-class Styledown
-  extend self
+require 'styledown/source'
 
+class Styledown
   def self.context
     @context ||= begin
       require 'execjs'
@@ -8,15 +8,15 @@ class Styledown
     end
   end
 
-  def build(source, options = {})
+  def self.build(source, options = {})
     context.call('Styledown.build', source, options)
   end
 
-  def render(data, options = {})
+  def self.render(data, options = {})
     context.call('Styledown.render', data, options)
   end
 
-  def read
+  def self.read
     # TODO
   end
 end
