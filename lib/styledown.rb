@@ -52,6 +52,7 @@ class Styledown
 
     # Pipeline artifacts
     @input = nil
+    @raw_data = nil
     @data = nil
     @output = nil
 
@@ -70,6 +71,7 @@ class Styledown
 
   # Renders if needed. Does nothing if it's already been rendered.
   def render
+    # TODO: mtime caching
     render! unless @output
     self
   end
@@ -78,21 +80,33 @@ class Styledown
   #
   # Also aliased as `#reload`.
   def render!
-    @input = Styledown.read(@paths, @options)
-    @data = Styledown.build(@input, @options)
-    @data = apply_data_filters(@data)
-    @output = Styledown.render(@data, @options)
+    invalidate
+    @input ||= Styledown.read(@paths, @options)
+    @raw_data ||= Styledown.build(@input, @options)
+    @data ||= apply_data_filters(@raw_data)
+    @output ||= Styledown.render(@data, @options)
     self
   end
 
   # Busts the cache
   def invalidate
     @input = nil
+    @raw_data = nil
+    invalidate_data
+  end
+
+  # Busts the cache, partially
+  def invalidate_data
     @data = nil
     @output = nil
   end
 
+  def valid?
+    !!@output
+  end
+
   def add_data_filter(&blk)
+    invalidate_data
     @data_filters << blk
   end
 
