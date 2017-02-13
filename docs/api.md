@@ -80,15 +80,28 @@ Adds a function to be invoked on [#render](#render) that will transform Styledow
 styleguide = Styledown.new('/path/to/guides')
 
 styleguide.add_part_filter do |part|
-  if part['language'] == 'erb'
-    part['contents'] = ERB.render(part['contents'])
-  end
+  part['class'] += ' my-class'
   part
 end
 
 styleguide.render
 ```
 
+### add\_figure\_filter
+
+> `styleguide.add_figure_filter(language) { |content| ... }`
+
+Adds a function to be invoked on [#render](#render) for transpiling example figures. The given block should return `[language, content]` where `language` is the new language it was transformed to, and `content` is the transformed result.
+
+```rb
+styleguide = Styledown.new('/path/to/guides')
+
+styleguide.add_figure_filter('erb') do |contetns|
+  [ 'html', ERB.render(contents) ]
+end
+
+styleguide.render
+```
 
 ## Class functions
 

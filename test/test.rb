@@ -68,4 +68,17 @@ describe 'OOP API' do
     html = result['buttons.html']['contents']
     expect(html).must_include 'lang-wololo'
   end
+
+  it 'should honor figure filters' do
+    styleguide = Styledown.new(EXAMPLE, skipAssets: true)
+    styleguide.add_figure_filter('html') do |contents|
+      ['superhtml', "<!-- #{contents} -->"]
+    end
+    styleguide.render
+
+    result = styleguide.output
+
+    html = result['buttons.html']['contents']
+    expect(html).must_include "<!-- <a class='btn'>Button</a> -->"
+  end
 end

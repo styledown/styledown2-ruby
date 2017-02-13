@@ -85,21 +85,35 @@ class Styledown
 
   # Adds a function that will transform sections on `#render`.
   def add_section_filter(&blk)
-    add_file_filter do |fname, file|
+    add_file_filter do |filename, file|
       file['sections'].map! do |section|
-        blk.(section, fname, file)
+        blk.(section, filename, file)
       end if file['sections']
-      [fname, file]
+      [filename, file]
     end
   end
 
   # Adds a function that will transform section parts on `#render`.
   def add_part_filter(&blk)
-    add_section_filter do |section, fname, file|
+    add_section_filter do |section, filename, file|
       section['parts'].map! do |part|
-        blk.(part, section, fname, file)
+        blk.(part, section, filename, file)
       end if section['parts']
       section
+    end
+  end
+
+  # Adds a function that will transform section part figures on `#render`.
+  def add_figure_filter(lang, &blk)
+    add_part_filter do |part, section, filename, file|
+      if part['isExample'] && [*lang].map(&:to_s).include?(part['language'])
+        lang, content = blk.(part['content'])
+        part['content'] = content
+        part['language'] = lang
+        part
+      else
+        part
+      end
     end
   end
 
