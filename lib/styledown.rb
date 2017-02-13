@@ -46,7 +46,7 @@ class Styledown
   attr_reader :output
 
   # Returns a styleguide context.
-  def initialize(paths, options = {})
+  def initialize(paths = nil, options = {})
     @paths = paths
     @options = options
 
