@@ -37,8 +37,10 @@ class Styledown
 
   SEARCH_GLOB = '{styledown.json,**/*.md,templates/**/*.{html,js,css}}'
 
-  attr_reader :paths
-  attr_reader :options
+  # You can change these and they will be honored on next #render
+  attr_accessor :paths
+  attr_accessor :options
+
   attr_reader :input
   attr_reader :data
   attr_reader :output
