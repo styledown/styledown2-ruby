@@ -38,8 +38,8 @@ class Styledown
   SEARCH_GLOB = '{styledown.json,**/*.md,templates/**/*.{html,js,css}}'
 
   # You can change these and they will be honored on next #render
-  attr_accessor :paths
-  attr_accessor :options
+  attr_reader :paths
+  attr_reader :options
 
   attr_reader :input
   attr_reader :data
@@ -58,15 +58,38 @@ class Styledown
     @data_filters = []
   end
 
+  def paths=(paths)
+    invalidate
+    @paths = paths
+  end
+
+  def options=(paths)
+    invalidate
+    @options = paths
+  end
+
+  # Renders if needed. Does nothing if it's already been rendered.
+  def render
+    render! unless @output
+    self
+  end
+
   # Re-reads files, processes them, and updates the `#output`.
   #
   # Also aliased as `#reload`.
-  def render
-    @input  = Styledown.read(@paths, @options)
+  def render!
+    @input = Styledown.read(@paths, @options)
     @data = Styledown.build(@input, @options)
     @data = apply_data_filters(@data)
     @output = Styledown.render(@data, @options)
     self
+  end
+
+  # Busts the cache
+  def invalidate
+    @input = nil
+    @data = nil
+    @output = nil
   end
 
   def add_data_filter(&blk)
@@ -128,5 +151,5 @@ class Styledown
     end
   end
 
-  alias :reload :render
+  alias :reload :render!
 end
