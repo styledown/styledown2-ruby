@@ -3,6 +3,6 @@
 ### form
 A form
 
-```example.html
-<form class='form'></form>
+```example.haml
+%form.form
 ```

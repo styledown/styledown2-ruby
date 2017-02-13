@@ -41,7 +41,9 @@ class Styledown
   attr_reader :paths
   attr_reader :options
 
+  # Pipeline artifacts
   attr_reader :input
+  attr_reader :raw_data
   attr_reader :data
   attr_reader :output
 
@@ -49,12 +51,6 @@ class Styledown
   def initialize(paths = nil, options = {})
     @paths = paths
     @options = options
-
-    # Pipeline artifacts
-    @input = nil
-    @raw_data = nil
-    @data = nil
-    @output = nil
 
     @data_filters = []
   end
@@ -136,7 +132,8 @@ class Styledown
   def add_part_filter(&blk)
     add_section_filter do |section, filename, file|
       section['parts'].map! do |part|
-        blk.(part, section, filename, file)
+        res = blk.(part, section, filename, file)
+        res
       end if section['parts']
       section
     end
@@ -146,9 +143,9 @@ class Styledown
   def add_figure_filter(lang, &blk)
     add_part_filter do |part, section, filename, file|
       if part['isExample'] && [*lang].map(&:to_s).include?(part['language'])
-        lang, content = blk.(part['content'])
-        part['content'] = content
-        part['language'] = lang
+        new_lang, new_content = blk.(part['content'])
+        part['content'] = new_content
+        part['language'] = new_lang
         part
       else
         part
@@ -160,8 +157,8 @@ class Styledown
 
   # Applies data filters defined by `add_*_filter` functions.
   def apply_data_filters(data)
-    @data_filters.reduce(data) do |data, filter|
-      filter.(data)
+    @data_filters.reduce(data) do |data_, filter|
+      filter.(data_)
     end
   end
 

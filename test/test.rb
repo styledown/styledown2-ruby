@@ -89,4 +89,18 @@ describe 'OOP API' do
     html = result['buttons.html']['contents']
     expect(html).must_include "<!-- <a class='btn'>Button</a> -->"
   end
+
+  it 'repeating figure filters' do
+    styleguide = Styledown.new(EXAMPLE, skipAssets: true)
+    styleguide.add_figure_filter('haml') do |contents|
+      ['html', "<!-- #{contents} -->"]
+    end
+    styleguide.render
+    styleguide.render!
+
+    result = styleguide.output
+
+    html = result['forms.html']['contents']
+    expect(html).must_include "<!-- %form.form -->"
+  end
 end
