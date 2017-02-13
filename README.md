@@ -12,6 +12,8 @@ gem 'styledown2'
 
 ## API
 
+See [API reference](docs/api.md) for full API reference.
+
 ### Object-oriented API
 
 This gem provides a `Styledown` class.
@@ -28,6 +30,8 @@ styleguide.output
 # }
 ```
 
+See [API reference](docs/api.md#styledown) for full reference on the `Styledown` class.
+
 ### Functional API
 
 This implements the same functional API as the JavaScript `styledown2`.
@@ -37,6 +41,8 @@ files  = Styledown.read(...)
 data   = Styledown.parse(files)
 output = Styledown.render(data)
 ```
+
+See [API reference](docs/api.md#class-methods) for full reference on `Styledown` class methods.
 
 ## Thanks
 

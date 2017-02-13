@@ -72,11 +72,11 @@ class Styledown
   end
 
   # Adds a function that will transform files on `#render`.
-  # The given block should return `[fname, file]`.
+  # The given block should return `[filename, file]`.
   def add_file_filter(&blk)
     add_data_filter do |data|
-      files = data['files'].map do |fname, file|
-        blk.(fname, file) # => [fname, file]
+      files = data['files'].map do |filename, file|
+        blk.(filename, file) # => [filename, file]
       end
       data['files'] = Hash[files]
       data
