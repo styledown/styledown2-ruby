@@ -1,4 +1,7 @@
+require 'bundler'
 task default: :test
+
+Bundler::GemHelper.install_tasks
 
 desc 'Runs tests'
 task :test do
