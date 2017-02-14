@@ -1,36 +1,20 @@
+require 'styledown/class_methods'
 require 'styledown/source'
 require 'styledown/file_reader'
 
 class Styledown
-  def self.context
-    @context ||= begin
-      require 'execjs'
-      ExecJS.compile(Styledown::Source::SOURCE)
-    end
-  end
-
-  def self.build(source, options = {})
-    context.call('Styledown.build', source, options)
-  end
-
-  def self.render(data, options = {})
-    context.call('Styledown.render', data, options)
-  end
-
-  # Reimplementation of Styledown.read(). Reads files and returns their contents into a Hash.
-  def self.read(paths, options = {})
-    FileReader.read(paths, options)
-  end
+  extend Styledown::ClassMethods
 
   # You can change these and they will be honored on next #render
   attr_reader :paths
   attr_reader :options
 
   # Pipeline artifacts
-  attr_reader :input
-  attr_reader :raw_data
-  attr_reader :data
-  attr_reader :output
+  attr_reader :mtime     # Last modified time
+  attr_reader :input     # Output of Styledown.read
+  attr_reader :raw_data  # Output of Styledown.build
+  attr_reader :data      # Output of apply_data_filters
+  attr_reader :output    # Output of Styledown.render (final output)
 
   # Returns a styleguide context.
   def initialize(paths = nil, options = {})
@@ -52,13 +36,12 @@ class Styledown
 
   # Reads files, processes them, and updates the `#output`.
   def render
-    # Bust the cache if it's been modified since last render
-    if_updated { invalidate }
-    render_if_needed
+    invalidate_if_updated
+    fast_render
   end
 
   # Renders without invalidation.
-  def render_if_needed
+  def fast_render
     @input ||= Styledown.read(@paths, @options)
     @raw_data ||= Styledown.build(@input, @options)
     @data ||= apply_data_filters(@raw_data)
@@ -146,10 +129,10 @@ class Styledown
   private
 
   # Checks if it's been update since last call of `#if_updated`.
-  def if_updated(&blk)
+  def invalidate_if_updated
     mtime = Styledown::FileReader.mtime(@paths)
     if mtime != @mtime
-      yield
+      invalidate
       @mtime = mtime
     end
   end

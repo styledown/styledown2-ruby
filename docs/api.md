@@ -23,6 +23,12 @@ styleguide.output
 
 Processes files and updates [#output](#output). Styledown keeps a cache, so this will not re-read or re-process if no files have changed. See [Styledown class](#styledown) for an example.
 
+### fast_render
+
+> `styleguide.fast_render`
+
+Like [#render](#render), but skips checking if any files have been updated. Use this in production.
+
 ### render!
 
 > `styleguide.render!`
