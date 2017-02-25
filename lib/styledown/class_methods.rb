@@ -22,5 +22,9 @@ class Styledown
     def read(paths, options = {})
       FileReader.read(paths, options)
     end
+
+    def js_version
+      context.eval('Styledown.version')
+    end
   end
 end

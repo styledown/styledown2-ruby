@@ -4,12 +4,20 @@ require 'styledown'
 EXAMPLE = File.expand_path('../fixtures/example', __FILE__)
 
 describe 'Functional API' do
+  it 'should be using the correct styledown2.js version' do
+    expect(Styledown.js_version).must_equal Styledown::VERSION.gsub(/\.pre/, '-pre')
+  end
+
   it 'should work' do
-    data = Styledown.build({ 'buttons.md': { contents: '# Hello' } }, skipAssets: true)
+    data = Styledown.build({ 'buttons.md': { contents: '# Hello' } })
     result = Styledown.render(data)
 
     expect(result['buttons.html']['contents']).must_include "<h1 id='hello'>Hello</h1>"
     expect(result['buttons.html']['contents']).must_include "name='generator' content='Styledown2 2"
+    expect(result['styledown/styleguide.css']['contents']).must_include 'margin'
+    expect(result['styledown/styleguide.js']['contents']).must_include 'function'
+    expect(result['styledown/figure.css']['contents']).must_include 'body'
+    expect(result['styledown/figure.js']['contents']).must_include 'function'
   end
 
   it 'honors extensions' do
