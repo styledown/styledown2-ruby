@@ -114,15 +114,14 @@ class Styledown
 
   # Adds a function that will transform section part figures on `#render`.
   def add_figure_filter(lang, &blk)
-    add_part_filter do |part, section, filename, file|
-      if part['isExample'] && [*lang].map(&:to_s).include?(part['language'])
-        new_lang, new_content = blk.(part['content'])
-        part['content'] = new_content
-        part['language'] = new_lang
-        part
-      else
-        part
+    add_file_filter do |filename, file|
+      if file['layout'] == 'figure' && [*lang].map(&:to_s).include?(file['language'])
+        new_lang, new_content = blk.(file['content'])
+        file['content'] = new_content
+        file['language'] = new_lang
+        file
       end
+      [filename, file]
     end
   end
 

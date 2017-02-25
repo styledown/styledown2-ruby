@@ -40,7 +40,7 @@ describe 'OOP API' do
 
     expect(result['buttons.html']['contents']).must_include 'Buttons</h1>'
     expect(result['forms.html']['contents']).must_include 'Forms</h1>'
-    expect(result['buttons.html']['contents']).must_include 'bootstrap.min.css'
+    expect(result['examples/buttons/btn-2.html']['contents']).must_include 'bootstrap.min.css'
   end
 
   it 'should honor data filters' do
@@ -86,7 +86,7 @@ describe 'OOP API' do
 
     result = styleguide.output
 
-    html = result['buttons.html']['contents']
+    html = result['examples/buttons/btn-2.html']['contents']
     expect(html).must_include "<!-- <a class='btn'>Button</a> -->"
   end
 
@@ -100,7 +100,7 @@ describe 'OOP API' do
 
     result = styleguide.output
 
-    html = result['forms.html']['contents']
+    html = result['examples/forms/form-2.html']['contents']
     expect(html).must_include "<!-- %form.form -->"
   end
 end
